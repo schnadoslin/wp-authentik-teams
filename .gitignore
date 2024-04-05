@@ -26,6 +26,7 @@ composer.lock
 # CMake
 cmake-build-debug/
 
+/vendor/
 
 ## File-based project format:
 *.iws
