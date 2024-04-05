@@ -22,7 +22,7 @@
 # User-specific stuff:
 .idea
 .idea_modules/
-
+composer.lock
 # CMake
 cmake-build-debug/
 
