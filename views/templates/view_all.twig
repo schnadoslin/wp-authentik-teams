@@ -1,0 +1,37 @@
+<link rel="stylesheet" type="text/css" href="{{ asset('css/tablestyle.css') }}" />
+<div role="table"
+     aria-label="Teams"
+     aria-describedby="teams_table_desc">
+    <div id="teams_table_desc">
+        All PhaKIR Teams with their responsible team leader.
+    </div><div role="rowgroup">
+        <div role="row">
+      <span role="columnheader">
+        Team name
+      </span>
+            <span role="columnheader">
+        Team leader
+      </span>
+        </div>
+    </div>
+    <div role="rowgroup">
+        {% for team in all_teams %}
+            <div role="row" onclick="document.getElementById('form-{{ get_team_id(team)}}').submit();">
+                <span role="cell">{{ get_team_name(team) }}</span>
+                <span role="cell">{{ get_team_leader(team) }}</span>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+{% for team in all_teams %}
+<form id="form-{{ get_team_id(team) }}" action="{{ admin_post_url }}" method="post">
+    <input type="hidden" name="team_id" value="{{ get_team_id(team)}}">
+    <input type="hidden" name="action" value="change_to_edit_team">
+
+</form>
+{% endfor %}
+
+<form  id="change_to_create_team_form" action="{{ admin_post_url }}" method="post" >
+<input type="hidden" name="action" value="change_to_create_team">
+<button class="button button-primary" type="submit">Create new Team</button>
+</form>

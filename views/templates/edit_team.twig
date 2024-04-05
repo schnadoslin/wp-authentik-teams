@@ -1,0 +1,93 @@
+<link rel="stylesheet" type="text/css" href="{{ asset('css/listbox.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('css/button.css') }}" />
+
+<script src="{{ asset('js/listbox.js') }}"></script>
+<script src="{{ asset('js/listbox-rearrangeable.js') }}"></script>
+<script src="{{ asset('js/toolbar.js') }}"></script>
+
+<form  onsubmit="gatherSelectedOptions()" id="edit_team_form" action="{{ admin_post_url }}" method="post" >
+    <input type="hidden" name="action" value="edit_team">
+
+    <h1>{{ get_team_name(team) }}</h1>
+        <div class="listbox-area">
+        <div class="left-area">
+    <span id="ms_av_l" class="listbox-label">
+      PhaKIR members:
+    </span>
+            <ul id="ms_imp_list"
+                tabindex="0"
+                role="listbox"
+                aria-labelledby="ms_av_l"
+                aria-multiselectable="true">
+                {% for user in all_users %}
+                    {% if not is_in_group(user,team) %}
+                        <li id={{ get_user_id(user) }}
+                            role="option"
+                            aria-selected="false">
+                            <span class="checkmark" aria-hidden="true"></span>
+                            {{ get_user_name(user) }}
+                        </li>
+
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <button type="button"
+                    id="ex2-add"
+                    class="move-right-btn"
+                    aria-keyshortcuts="Alt+ArrowRight Enter"
+                    aria-disabled="true">
+                <span class="checkmark" aria-hidden="true"></span>
+                Add
+            </button>
+        </div>
+        <div class="right-area">
+    <span id="ms_ch_l" class="listbox-label">
+      Your team members:
+    </span>
+            <ul id="ms_unimp_list"
+                tabindex="0"
+                role="listbox"
+                aria-labelledby="ms_ch_l"
+                aria-activedescendant=""
+                aria-multiselectable="true">
+                {% for user in all_users %}
+                    {% if is_in_group(user,team) %}
+                        <li id={{ get_user_id(user) }}
+                            role="option"
+                            aria-selected="false">
+                            <span class="checkmark" aria-hidden="true"></span>
+                            {{ get_user_name(user) }}
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <button type="button"
+                    id="ex2-delete"
+                    class="move-left-btn"
+                    aria-keyshortcuts="Alt+ArrowLeft Delete"
+                    aria-disabled="true">
+                <span class="checkmark" aria-hidden="true"></span>
+                Remove
+            </button>
+        </div>
+        <div class="offscreen">
+            Last change:
+            <span aria-live="polite" id="ms_live_region"></span>
+        </div>
+    </div>
+    <p>
+        noch weiterer Text, der evtl. hilfreich ist
+    </p>
+    <input type="hidden" id="selectedOptions" name="selectedOptions">
+    <button class="button button-primary" type="submit">Create Team</button>
+
+    <script>
+        function gatherSelectedOptions() {
+            //var form = document.getElementById('create_team_form');
+            var listbox = document.getElementById('ms_unimp_list');
+            var selectedOptionsInput = document.getElementById('selectedOptions');
+            var selectedOptions = Array.from(listbox.children).map(option => option.id);
+            selectedOptionsInput.value = JSON.stringify(selectedOptions);
+        }
+    </script>
+</form>
