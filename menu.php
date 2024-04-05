@@ -43,6 +43,18 @@ function authentik_team_plugin_options() {
             <label><?php _e("Authentik Base URL:", "authentik-teams"); ?></label>
             <input class="" size = 100 type="text" name="base_url" value="<?php echo get_option('base_url')?>" />
         </p>
+        <p>
+            <label><?php _e("Admin Prefix:", "authentik-teams"); ?></label>
+            <input class="" size = 100 type="text" name="admin_prefix" value="<?php echo get_option('admin_prefix')?>" />
+        </p>
+        <p>
+            <label><?php _e("Only Allow active users:", "authentik-teams"); ?></label>
+            <input class="" size = 100 type="checkbox" name="ony_allow_active" <?php checked(1, get_option('ony_allow_active'), true); ?> value="1" />
+        </p>
+        <p>
+            <label><?php _e("Group Prefix:", "authentik-teams"); ?></label>
+            <input class="" size = 100 type="text" name="group_prefix" value="<?php echo get_option('group_prefix')?>" />
+        </p>
 
         <input class="button button-primary" type="submit" value="<?php _e("Save", "authentik-teams"); ?>" />
         <h4>Additional Requirements</h4>
@@ -66,13 +78,16 @@ function authentik_handle_save()
 
         update_option("api_token", $_POST["api_token"], TRUE);
         update_option("base_url", $_POST["base_url"], TRUE);
+        update_option("admin_prefix", $_POST["admin_prefix"], TRUE);
+        update_option("ony_allow_active", $_POST["ony_allow_active"], TRUE);
+        update_option("group_prefix", $_POST["group_prefix"], TRUE);
 
     }
 
     // API - Check
     if(get_option("api_token") != "")
     {
-        init_api();
+        init_api_func();
     }
     // Redirect back to settings page
     // The ?page=github corresponds to the "slug"
