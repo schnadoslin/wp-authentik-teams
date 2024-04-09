@@ -32,6 +32,8 @@ function get_all_teams_view()
     $client = get_API_instance_func();
     $groups = $client->coreGroupsList()->getResults();
     $groups = array_filter($groups, function ($item){return !empty($item->getUsersObj());});
+
+
     if (get_option("group_prefix")) {
         $groups = array_filter($groups, function ($item) {
             return strpos($item->getName(), get_option("group_prefix")) === 0;
@@ -43,7 +45,23 @@ function get_all_teams_view()
                 $item->setName(substr($name, $prefixLength));
             }
         }
-    }
+   }
+    $target_user = wp_get_current_user()->display_name;
+
+    $mygroups =array_filter($groups, function ($group) use ($target_user) {
+        foreach ($group->getUsersObj() as $member) {
+
+            if ($member->getName() === $target_user) {
+                return true;
+            }
+        }return false;}
+    );
+
+    $groups = array_filter($groups, function ($group) use ($mygroups) {
+        return !in_array($group, $mygroups);
+    });
+
+
 
     // Twig-Loader und -Environment initialisieren
     $loader = new FilesystemLoader('wp-content\\plugins\\authentik_teams\\views\\templates');
@@ -59,7 +77,8 @@ function get_all_teams_view()
     $template = $twig->load('view_all.twig');
 
     $html = $template->render(array(
-    'all_teams' => $groups, // hier muss man den prefix noch entfernen,
+    'all_teams' => $groups,
+        'my_teams' => $mygroups,
     'admin_post_url' => admin_url('admin-post.php')
 
     ));

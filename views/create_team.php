@@ -60,6 +60,12 @@ add_action('admin_post_create_team', 'action_create_team');
 function action_create_team() {
 
         $teamname = $_POST['teamname'];
+        if (empty($teamname))
+        {
+            update_option('teamname_taken', 'The team name is empty ...');
+            wp_redirect(wp_get_referer());
+            exit();
+        }
         // Checks
         $client = get_API_instance_func();
         $groups = $client->coreGroupsList()->getResults();
@@ -139,4 +145,14 @@ function my_error_notice() {
             update_option($errortype, '');
         }
     }
+}
+
+add_action('admin_post_change_to_view_team', 'change_to_view_team');
+
+function change_to_view_team()
+{
+    $referer = wp_get_referer();
+    $url_without_view = remove_query_arg('view', wp_get_referer());
+    header('Location:' . $url_without_view);
+    exit;
 }
