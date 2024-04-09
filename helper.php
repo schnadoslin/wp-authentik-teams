@@ -6,7 +6,7 @@ use OpenAPI\Client\Model\User;
 use OpenAPI\Client\Api\CoreApi;
 /**
  * @param  CoreApi $client
- * @return array
+ * @return User[]
  */
 function get_filtered_Users($client)
 {
@@ -69,6 +69,22 @@ function is_in_group($target_user,$group)
 
     return !empty($filtered_objects);}
 
+/**
+ * @param User $target_user
+ * @param Group $group
+ * @return string
+ */
+function is_leader($group)
+{
+    $leader = $group->getAttributes()["Leader"];
+    $cur = get_current_Authentik_User();
+
+    if ( $cur->getUsername() == $leader )
+        return true;
+
+     return false;}
+
+
 
 /**
  * @param Group $group
@@ -114,9 +130,18 @@ function is_current_user($user)
     return false;
 }
 
-
-
-
+/**
+ * @return User
+ */
+function get_current_Authentik_User()
+{
+    $client = get_API_instance_func();
+    $users = get_filtered_Users($client);
+    $matchingCurrentUser = array_filter($users, function ($user) {
+        return $user['name'] == wp_get_current_user()->display_name;
+    });
+    return $matchingCurrentUser[0];
+}
 
 // design and javascript linker
 

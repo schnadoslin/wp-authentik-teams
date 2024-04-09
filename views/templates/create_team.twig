@@ -84,7 +84,9 @@
  noch weiterer Text, der evtl. hilfreich ist
 </p>
     <input type="hidden" id="selectedOptions" name="selectedOptions">
-    <button class="button button-primary" type="submit">Create Team</button>
+        <button class="button button-primary" type="submit">Create Team</button>
+
+
 
 <script>
     function gatherSelectedOptions() {
@@ -95,4 +97,8 @@
         selectedOptionsInput.value = JSON.stringify(selectedOptions);
     }
 </script>
+</form>
+<form  id="change_to_view_team_form" action="{{ admin_post_url }}" method="post" >
+    <input type="hidden" name="action" value="change_to_view_team">
+    <button class="button button-primary" type="submit">Return to team overview</button>
 </form>

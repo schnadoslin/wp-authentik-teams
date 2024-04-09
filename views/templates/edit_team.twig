@@ -7,6 +7,7 @@
 
 <form  onsubmit="gatherSelectedOptions()" id="edit_team_form" action="{{ admin_post_url }}" method="post" >
     <input type="hidden" name="action" value="edit_team">
+    <input type="hidden" name="team_id" value={{team_id}}>
 
     <h1>{{ get_team_name(team) }}</h1>
         <div class="listbox-area">
@@ -31,6 +32,7 @@
                     {% endif %}
                 {% endfor %}
             </ul>
+            {% if is_leader(team) %}
             <button type="button"
                     id="ex2-add"
                     class="move-right-btn"
@@ -39,6 +41,7 @@
                 <span class="checkmark" aria-hidden="true"></span>
                 Add
             </button>
+            {% endif %}
         </div>
         <div class="right-area">
     <span id="ms_ch_l" class="listbox-label">
@@ -61,6 +64,7 @@
                     {% endif %}
                 {% endfor %}
             </ul>
+            {% if is_leader(team) %}
             <button type="button"
                     id="ex2-delete"
                     class="move-left-btn"
@@ -69,6 +73,7 @@
                 <span class="checkmark" aria-hidden="true"></span>
                 Remove
             </button>
+            {% endif %}
         </div>
         <div class="offscreen">
             Last change:
@@ -79,8 +84,9 @@
         noch weiterer Text, der evtl. hilfreich ist
     </p>
     <input type="hidden" id="selectedOptions" name="selectedOptions">
-    <button class="button button-primary" type="submit">Create Team</button>
-
+    {% if is_leader(team) %}
+    <button class="button button-primary" type="submit">Save Changes on Team</button>
+    {% endif %}
     <script>
         function gatherSelectedOptions() {
             //var form = document.getElementById('create_team_form');
@@ -90,4 +96,8 @@
             selectedOptionsInput.value = JSON.stringify(selectedOptions);
         }
     </script>
+</form>
+<form  id="change_to_view_team_form" action="{{ admin_post_url }}" method="post" >
+    <input type="hidden" name="action" value="change_to_view_team">
+    <button class="button button-primary" type="submit">Return to team overview</button>
 </form>
