@@ -44,3 +44,5 @@ fabric.properties
 /.tmp
 !.gitignore
 !.gitkeep
+
+.DS_Store

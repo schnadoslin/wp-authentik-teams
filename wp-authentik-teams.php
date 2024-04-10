@@ -12,8 +12,8 @@ License: A "Slug" license name e.g. GPL2
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 // Load vendors
-require_once(__DIR__ . '\\codegen\\out\\vendor\\autoload.php');
-require_once(__DIR__ . '\\vendor\\autoload.php');
+require_once(__DIR__ . '/codegen/out/vendor/autoload.php');
+require_once(__DIR__ . '/vendor/autoload.php');
 
 
 //require_once(__DIR__ . '\\codegen\\out\\lib');

@@ -77,13 +77,12 @@ function is_in_group($target_user,$group)
 function is_leader($group)
 {
     $leader = $group->getAttributes()["Leader"];
-    $cur = get_current_Authentik_User();
 
+    $cur = get_current_Authentik_User();
     if ( $cur->getUsername() == $leader )
         return true;
 
      return false;}
-
 
 
 /**
@@ -137,10 +136,14 @@ function get_current_Authentik_User()
 {
     $client = get_API_instance_func();
     $users = get_filtered_Users($client);
-    $matchingCurrentUser = array_filter($users, function ($user) {
-        return $user['name'] == wp_get_current_user()->display_name;
-    });
-    return $matchingCurrentUser[0];
+    $matchingCurrentUser = array_reduce($users, function ($carry, $user) {
+        if ($user['name'] === wp_get_current_user()->display_name) {
+            return $user;
+        }
+        return $carry;
+    }, null);
+
+    return $matchingCurrentUser;
 }
 
 // design and javascript linker

@@ -10,8 +10,12 @@
     <input type="hidden" name="team_id" value={{team_id}}>
 
     <h1>{{ get_team_name(team) }}</h1>
+    <div>
+        Team Leader: {{ team_leader }}
+    </div>
         <div class="listbox-area">
         <div class="left-area">
+
     <span id="ms_av_l" class="listbox-label">
       PhaKIR members:
     </span>
@@ -32,7 +36,7 @@
                     {% endif %}
                 {% endfor %}
             </ul>
-            {% if is_leader(team) %}
+            {% if is_leader(team, team_leader) %}
             <button type="button"
                     id="ex2-add"
                     class="move-right-btn"

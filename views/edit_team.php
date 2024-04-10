@@ -16,7 +16,6 @@ function get_edit_teams_view()
     session_start();
     $team_id = $_SESSION['team_id'];
 
-
     $client = get_API_instance_func();
     $users = get_filtered_Users($client);
 
@@ -31,7 +30,7 @@ function get_edit_teams_view()
     }
 
     // Twig-Loader und -Environment initialisieren
-    $loader = new FilesystemLoader('wp-content\\plugins\\authentik_teams\\views\\templates');
+    $loader = new FilesystemLoader('wp-content/plugins/authentik_teams/views/templates');
     $twig = new Environment($loader);
     // Funktionen laden
     $twig->addFunction(new \Twig\TwigFunction('get_team_name','get_team_name'));
@@ -46,6 +45,7 @@ function get_edit_teams_view()
     $template = $twig->load('edit_team.twig');
 
     $html = $template->render(array(
+        'team_leader' => get_team_leader($group),
         'team_id' => $group->getPk(), // hier muss man den prefix noch entfernen,
         'team' => $group,
         'admin_post_url' => admin_url('admin-post.php'),

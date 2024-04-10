@@ -64,7 +64,7 @@ function get_all_teams_view()
 
 
     // Twig-Loader und -Environment initialisieren
-    $loader = new FilesystemLoader('wp-content\\plugins\\authentik_teams\\views\\templates');
+    $loader = new FilesystemLoader('wp-content/plugins/authentik_teams/views/templates');
     $twig = new Environment($loader);
     // Funktionen laden
     $twig->addFunction(new \Twig\TwigFunction('get_team_leader','get_team_leader'));

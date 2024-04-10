@@ -34,7 +34,7 @@ function get_create_teams_view()
     $users = get_filtered_Users($client);
 
     // Twig-Loader und -Environment initialisieren
-    $loader = new FilesystemLoader('wp-content\\plugins\\authentik_teams\\views\\templates');
+    $loader = new FilesystemLoader('wp-content/plugins/authentik_teams/views/templates');
     $twig = new Environment($loader);
     // Funktionen laden
     $twig->addFunction(new \Twig\TwigFunction('get_user_name', 'get_user_name'));
@@ -90,9 +90,13 @@ function action_create_team() {
     $matchingUsers = array_filter($users, function ($user) use ($selectedOptions) {
         return in_array($user->getUuid(), $selectedOptions);
     });
-    $matchingCurrentUser = array_filter($matchingUsers, function ($user) {
-        return $user['name'] == wp_get_current_user()->display_name;
-    });
+    $matchingCurrentUser = array_reduce($matchingUsers, function ($carry, $user) {
+        if ($user['name'] === wp_get_current_user()->display_name) {
+            return $user;
+        }
+        return $carry;
+    }, null);
+
 if(empty($matchingCurrentUser))
 {
     update_option('user_not_in_team', 'You have to be in your own team ...');
@@ -100,12 +104,13 @@ if(empty($matchingCurrentUser))
     exit();
 }
 
+
     $newTeam = $client->coreGroupsCreate(
             new \OpenAPI\Client\Model\GroupRequest(
                     [
                             "name"=>get_option("group_prefix") . $teamname,
-                            "users"=>[$matchingCurrentUser[0]->getPk()],
-                            "attributes"=>array("Leader" => $matchingCurrentUser[0]->getUsername())
+                            "users"=>[$matchingCurrentUser->getPk()],
+                            "attributes"=>array("Leader" => $matchingCurrentUser->getUsername())
                     ]
             )
     );
