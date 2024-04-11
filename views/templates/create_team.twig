@@ -1,5 +1,6 @@
 <link rel="stylesheet" type="text/css" href="{{ asset('css/listbox.css') }}" />
 <link rel="stylesheet" type="text/css" href="{{ asset('css/button.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('css/loading.css') }}" />
 
 <script src="{{ asset('js/listbox.js') }}"></script>
 <script src="{{ asset('js/listbox-rearrangeable.js') }}"></script>
@@ -84,11 +85,20 @@
  noch weiterer Text, der evtl. hilfreich ist
 </p>
     <input type="hidden" id="selectedOptions" name="selectedOptions">
-        <button class="button button-primary" type="submit">Create Team</button>
-
-
+    <div id="container" style="display: flex; justify-content: center; align-items: center;">
+    <button  class="button button-primary" type="submit" id="createTeamButton" onclick="showLoading()">Create Team</button>
+    <div id="loading" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+    </div>
 
 <script>
+    function showLoading() {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('createTeamButton').style.display = 'none';
+        document.getElementById('returnButton').style.display = 'none';
+
+    }
     function gatherSelectedOptions() {
         //var form = document.getElementById('create_team_form');
         var listbox = document.getElementById('ms_unimp_list');
@@ -100,5 +110,5 @@
 </form>
 <form  id="change_to_view_team_form" action="{{ admin_post_url }}" method="post" >
     <input type="hidden" name="action" value="change_to_view_team">
-    <button class="button button-primary" type="submit">Return to team overview</button>
+    <button class="button button-primary" type="submit" id="returnButton" onclick="showLoading()">Return to team overview</button>
 </form>

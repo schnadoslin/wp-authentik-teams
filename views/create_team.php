@@ -115,9 +115,10 @@ if(empty($matchingCurrentUser))
             )
     );
 
-foreach (   $matchingUsers as $newUser)
+foreach ($matchingUsers as $newUser){
     if ($newUser ==$matchingCurrentUser[0])
         continue;
+
 $client->coreGroupsAddUserCreate(str_replace("-", "", $newTeam->getPk()),
 new \OpenAPI\Client\Model\UserAccountRequest(
         [
@@ -125,6 +126,7 @@ new \OpenAPI\Client\Model\UserAccountRequest(
         ]
 )
 );
+}
 
     session_start();
     $_SESSION['team_id'] = $newTeam->getPk();

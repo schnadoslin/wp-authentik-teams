@@ -1,5 +1,6 @@
 <link rel="stylesheet" type="text/css" href="{{ asset('css/tablestyle.css') }}" />
 <link rel="stylesheet" type="text/css" href="{{ asset('css/teamview.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('css/loading.css') }}" />
 
 <div class="container">
     <div class="floatLeft">
@@ -22,7 +23,7 @@
     </div>
     <div role="rowgroup">
         {% for team in all_teams%}
-            <div role="row" onclick="document.getElementById('form-{{ get_team_id(team)}}').submit();">
+            <div role="row" onclick="showLoading();document.getElementById('form-{{ get_team_id(team)}}').submit();">
                 <span role="cell">{{ get_team_name(team) }}</span>
                 <span role="cell">{{ get_team_leader(team) }}</span>
             </div>
@@ -50,7 +51,7 @@
     </div>
     <div role="rowgroup">
         {% for team in my_teams %}
-            <div role="row" onclick="document.getElementById('form-{{ get_team_id(team)}}').submit();">
+            <div role="row" onclick="showLoading();document.getElementById('form-{{ get_team_id(team)}}').submit();">
                 <span role="cell">{{ get_team_name(team) }}</span>
                 <span role="cell">{{ get_team_leader(team) }}</span>
             </div>
@@ -61,9 +62,22 @@
 </div>
 {# User controls below the information: #}
 
+<div id="container" style="display: flex; justify-content: center; align-items: center;">
+<div id="loading" style="display: none;">
+    <div class="spinner"></div>
+</div>
+</div>
+<script>
+    function showLoading() {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('createTeamButton').style.display = 'none';
+
+    }
+</script>
+
 <form  id="change_to_create_team_form" action="{{ admin_post_url }}" method="post" >
     <input type="hidden" name="action" value="change_to_create_team">
-    <button class="button button-primary" type="submit">Create new Team</button>
+    <button class="button button-primary" type="submit" id="createTeamButton" onclick="showLoading();">Create new Team</button>
 </form>
 
 {# Here the forms for the POSTs were created: #}

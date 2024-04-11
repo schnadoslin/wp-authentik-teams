@@ -1,9 +1,11 @@
 <link rel="stylesheet" type="text/css" href="{{ asset('css/listbox.css') }}" />
 <link rel="stylesheet" type="text/css" href="{{ asset('css/button.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('css/loading.css') }}" />
 
 <script src="{{ asset('js/listbox.js') }}"></script>
 <script src="{{ asset('js/listbox-rearrangeable.js') }}"></script>
 <script src="{{ asset('js/toolbar.js') }}"></script>
+
 
 <form  onsubmit="gatherSelectedOptions()" id="edit_team_form" action="{{ admin_post_url }}" method="post" >
     <input type="hidden" name="action" value="edit_team">
@@ -88,10 +90,20 @@
         noch weiterer Text, der evtl. hilfreich ist
     </p>
     <input type="hidden" id="selectedOptions" name="selectedOptions">
+    <div id="container" style="display: flex; justify-content: center; align-items: center;">
     {% if is_leader(team) %}
-    <button class="button button-primary" type="submit">Save Changes on Team</button>
+    <button class="button button-primary" type="submit" id="editTeamButton" onclick="showLoading()">Save Changes on Team</button>
     {% endif %}
+    <div id="loading" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+    </div>
     <script>
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('editTeamButton').style.display = 'none';
+            document.getElementById('returnButton').style.display = 'none';
+        }
         function gatherSelectedOptions() {
             //var form = document.getElementById('create_team_form');
             var listbox = document.getElementById('ms_unimp_list');
@@ -103,5 +115,5 @@
 </form>
 <form  id="change_to_view_team_form" action="{{ admin_post_url }}" method="post" >
     <input type="hidden" name="action" value="change_to_view_team">
-    <button class="button button-primary" type="submit">Return to team overview</button>
+    <button class="button button-primary" type="submit" id="returnButton" onclick="showLoading();">Return to team overview</button>
 </form>
