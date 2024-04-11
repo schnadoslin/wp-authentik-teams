@@ -6,42 +6,24 @@ use Twig\Environment;
 
 include_once  dirname( __DIR__ ) .'/helper.php';
 
-
-
-
-
-
-
 /**
- * Zeigt in einer Tabelle alle Teammitglieder und die Teamadmins an.
+ * A new team can be created with names and group members
  * @return string
  * @throws \OpenAPI\Client\ApiException *
  */
 function get_create_teams_view($users, $groups)
 {
-    $debug_create_start_time = microtime(true);
-    // Fügen Sie die Option hinzu, wenn sie noch nicht existiert
-    if (!get_option('teamname_taken')) {
-        add_option('teamname_taken', '');
-    }
-    // Fügen Sie die Option hinzu, wenn sie noch nicht existiert
-    if (!get_option('user_not_in_team')) {
-        add_option('user_not_in_team', '');
-    }
-
-    // Twig-Loader und -Environment initialisieren
+    // Initialize Twig-Loader und -Environment
     $loader = new FilesystemLoader('wp-content/plugins/authentik_teams/views/templates');
     $twig = new Environment($loader);
-    // Funktionen laden
+    // Load Functions
     $twig->addFunction(new \Twig\TwigFunction('get_user_name', 'get_user_name'));
     $twig->addFunction(new \Twig\TwigFunction('get_user_id', 'get_user_id'));
     $twig->addFunction(new \Twig\TwigFunction('asset', 'asset'));
     $twig->addFunction(new \Twig\TwigFunction('is_current_user', 'is_current_user'));
 
-
-    // Vorlage laden und rendern
+    // load and render template
     $template = $twig->load('create_team.twig');
-
     $html = $template->render(array(
         'all_users' => $users,
         'admin_post_url' => admin_url('admin-post.php'),
@@ -51,10 +33,20 @@ function get_create_teams_view($users, $groups)
     return $html;
 }
 
+/**
+ * Hook for creating a team in Authentik
+ */
 add_action('admin_post_create_team', 'action_create_team');
 
+/**
+ * Forward creation to Authentik API. Redirects to edit page.
+ * @return void
+ * @throws \OpenAPI\Client\ApiException
+ */
 function action_create_team() {
+    $client = get_API_instance_func();
 
+    // security checks: Teamname
         $teamname = $_POST['teamname'];
         if (empty($teamname))
         {
@@ -62,9 +54,8 @@ function action_create_team() {
             wp_redirect(wp_get_referer());
             exit();
         }
-        // Checks
-        $client = get_API_instance_func();
-        $groups = $client->coreGroupsList()->getResults();
+
+    $groups = $client->coreGroupsList()->getResults();
 
     $filteredItems = array_filter($groups, function ($item)use ($teamname){return !empty($item->getName()===get_option('group_prefix').$teamname);});
         if (!empty($filteredItems)) {
@@ -73,6 +64,8 @@ function action_create_team() {
             wp_redirect(wp_get_referer());
             exit();
         }
+
+    // security checks: Team-membership
     $users = $client->coreUsersList()->getResults();
 
     $selectedOptions = $_POST['selectedOptions'];
@@ -83,6 +76,7 @@ function action_create_team() {
         wp_redirect(wp_get_referer());
         exit();
     }
+
     $matchingUsers = array_filter($users, function ($user) use ($selectedOptions) {
         return in_array($user->getUuid(), $selectedOptions);
     });
@@ -100,6 +94,7 @@ if(empty($matchingCurrentUser))
     exit();
 }
 
+// API-CALL: create group and set teamleader
 
     $newTeam = $client->coreGroupsCreate(
             new \OpenAPI\Client\Model\GroupRequest(
@@ -111,6 +106,7 @@ if(empty($matchingCurrentUser))
             )
     );
 
+// API-CALL: add the users to the  group
 foreach ($matchingUsers as $newUser){
     if ($newUser ==$matchingCurrentUser[0])
         continue;
@@ -124,6 +120,8 @@ new \OpenAPI\Client\Model\UserAccountRequest(
 );
 }
 
+  // Redirect to EditPage of the created team
+
     session_start();
     $_SESSION['team_id'] = $newTeam->getPk();
     $referer = wp_get_referer();
@@ -132,26 +130,16 @@ new \OpenAPI\Client\Model\UserAccountRequest(
     exit;
 }
 
-add_action('wp_footer', 'my_error_notice');
-function my_error_notice() {
-    $errortypes = ['teamname_taken','user_not_in_team' ] ;
-    $error = [];
-    foreach ($errortypes as $errortype)
-    {
-        $error = get_option($errortype);
-        if (!empty($error)) {
-            ?>
-            <script type="text/javascript">
-                alert('<?php echo $error; ?>');
-            </script>
-            <?php
-            update_option($errortype, '');
-        }
-    }
-}
 
+/**
+ * Hook for redirecting to overview. This hook is used in the CREATE and the EDIT Team page.
+ */
 add_action('admin_post_change_to_view_team', 'change_to_view_team');
 
+/**
+ * Redirects to overview
+ * @return void
+ */
 function change_to_view_team()
 {
     $referer = wp_get_referer();

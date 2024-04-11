@@ -32,7 +32,16 @@ function open_wp_auth_teams( $atts )
     $users = get_filtered_Users($client);
     $groups = get_filtered_groups($client);
 
+    // ERROR-Options
+    if (!get_option('teamname_taken')) {
+        add_option('teamname_taken', '');
+    }
+    // Fügen Sie die Option hinzu, wenn sie noch nicht existiert
+    if (!get_option('user_not_in_team')) {
+        add_option('user_not_in_team', '');
+    }
 
+    // ROUTING
     $view = $_GET['view'] ?? 'default';
     switch ($view) {
         case 'create':
@@ -52,5 +61,30 @@ function open_wp_auth_teams( $atts )
   wp_die("Unknown View requested:". $view ." - The wp_auth_teams plugin is confused.");
 }
 
-
+// WORDPRESS SHORTCODE TO USE THE PLUGIN
 add_shortcode( "all_teams", "open_wp_auth_teams" );
+
+
+
+// ERROR Handling:
+add_action('wp_footer', 'my_error_notice');
+/**
+ * If an ERROR-OPTION changed, a javascript alert will pop up.
+ * @return void
+ */
+function my_error_notice() {
+    $errortypes = ['teamname_taken','user_not_in_team' ] ;
+    $error = [];
+    foreach ($errortypes as $errortype)
+    {
+        $error = get_option($errortype);
+        if (!empty($error)) {
+            ?>
+            <script type="text/javascript">
+                alert('<?php echo $error; ?>');
+            </script>
+            <?php
+            update_option($errortype, '');
+        }
+    }
+}

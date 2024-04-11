@@ -5,6 +5,10 @@ use OpenAPI\Client\Model\Group;
 use OpenAPI\Client\Model\User;
 use OpenAPI\Client\Api\CoreApi;
 /**
+ *  Return filtered users. Users are filtered by following aspects:
+ *  - only active users
+ *  - only users without a given admin_prefix (settings)
+
  * @param  CoreApi $client
  * @return User[]
  */
@@ -38,6 +42,9 @@ function get_filtered_Users($client)
 
 
 /**
+ * Return filtered groups. Groups are filtered by following aspects:
+ * - only non-empty groups
+ * - only groups with a given prefix (settings)
  * @param $client
  * @return Group[]
  */
@@ -61,11 +68,10 @@ function get_filtered_groups($client)
     return $groups;
 }
 
-
-
 // TWIG - Funktions.
 
 /**
+ * Checks if User is in Group
  * @param User $target_user
  * @param Group $group
  * @return string
@@ -80,6 +86,7 @@ function is_in_group($target_user,$group)
 
 
 /**
+ * Returns the Displayname of the Teamlead of the passed group
  * @param \OpenAPI\Client\Model\Group $group
  * @param \OpenAPI\Client\Model\User[] $users
  * @return string
@@ -105,7 +112,8 @@ function get_team_leader($group, $users) {
 
 
 /**
- * @param User $target_user
+ * Returns if the current logged in Wordpress-User is the Leader of the passed Authentik Group
+ * @param Users $users
  * @param Group $group
  * @return string
  */
@@ -153,6 +161,7 @@ function get_user_id($user)
     return $user->getUuid();
 }
 /**
+ * returns if the passed Authentik-User is the Wordpress User by comparing the Wordpress Display Name
  * @param User $user
  * @return mixed
  */
@@ -165,13 +174,14 @@ function is_current_user($user)
 }
 
 /**
- * @param User[] $users
+ * returns the Authentik User who is the logged in Wordpress User
+ * @param User[] $users filtered Users
  * @return mixed
  */
 function get_current_Authentik_User($users)
 {
     $matchingCurrentUser = array_reduce($users, function ($carry, $user) {
-        if ($user['name'] === wp_get_current_user()->display_name) {
+        if (is_current_user($user)) {
             return $user;
         }
         return $carry;
@@ -182,6 +192,11 @@ function get_current_Authentik_User($users)
 
 // design and javascript linker
 
-function asset($cssfile) {
-    return WP_CONTENT_URL  . '/plugins/authentik_teams/views/' . $cssfile;
+/**
+ * returns the JavaScript or CSS files in the view directory
+ * @param $cssfile
+ * @return string
+ */
+function asset($file) {
+    return WP_CONTENT_URL  . '/plugins/authentik_teams/views/' . $file;
 }

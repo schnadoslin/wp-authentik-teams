@@ -6,6 +6,7 @@ use Twig\Loader\FilesystemLoader;
 include_once  dirname( __DIR__ ) .'/helper.php';
 
 /**
+ * Displays all team members and allows new members to be added or removed.
  * @param \OpenAPI\Client\Model\User[] $users
  * @param \OpenAPI\Client\Model\Group[] $groups
  * @return string
@@ -15,11 +16,7 @@ include_once  dirname( __DIR__ ) .'/helper.php';
  */
 function get_edit_teams_view($users, $groups)
 {
-    // Fügen Sie die Option hinzu, wenn sie noch nicht existiert
-    if (!get_option('success')) {
-        add_option('success', '');
-    }
-
+    // Determine the current group
     session_start();
     $team_id = $_SESSION['team_id'];
 
@@ -31,6 +28,7 @@ function get_edit_teams_view($users, $groups)
         return $carry;
     }, null);
 
+    // Displayfake
     $name = $group->getName();
     $prefixLength = strlen(get_option("group_prefix"));
     if (strpos($name, get_option("group_prefix")) === 0) {
@@ -38,11 +36,11 @@ function get_edit_teams_view($users, $groups)
     }
 
 
-    // Twig-Loader und -Environment initialisieren
+    // Initialize Twig-Loader und -Environment
     $loader = new FilesystemLoader('wp-content/plugins/authentik_teams/views/templates');
     $twig = new Environment($loader);
 
-    // Funktionen laden
+    // Load Functions
     $twig->addFunction(new \Twig\TwigFunction('get_team_name','get_team_name'));
     $twig->addFunction(new \Twig\TwigFunction('asset','asset'));
     $twig->addFunction(new \Twig\TwigFunction('is_in_group','is_in_group'));
@@ -50,9 +48,8 @@ function get_edit_teams_view($users, $groups)
     $twig->addFunction(new \Twig\TwigFunction('get_user_id','get_user_id'));
     $twig->addFunction(new \Twig\TwigFunction('get_user_name','get_user_name'));
 
-    // Vorlage laden und rendern
+    // load and render template
     $template = $twig->load('edit_team.twig');
-
     $html = $template->render(array(
         'team_leader' => get_team_leader($group, $users),
         'team_id' => $group->getPk(), // hier muss man den prefix noch entfernen,
@@ -66,12 +63,16 @@ function get_edit_teams_view($users, $groups)
 }
 
 
-
-// TODO: edit programmieren und nur für team-leader anzeigbar machen
-// TODO: optik - zurück zur Teamübersicht
-
+/**
+ * Hook for saving changes on team in Authentik
+ */
 add_action('admin_post_edit_team', 'action_edit_team');
 
+/**
+ * Forward changes to Authentik API. Redirects to overview.
+ * @return void
+ * @throws \OpenAPI\Client\ApiException
+ */
 function action_edit_team()
 {
     $client = get_API_instance_func();
@@ -79,6 +80,8 @@ function action_edit_team()
 
     $selectedOptions = $_POST['selectedOptions'];
     $selectedOptions = json_decode(stripslashes($selectedOptions));
+
+    // Security checks
     if(empty($selectedOptions))
     {
         update_option('user_not_in_team', 'You have to be in your own team ...');
@@ -99,7 +102,7 @@ function action_edit_team()
         exit();
     }
 
-
+// Updating Group
      $group_id = $_POST['team_id'];
      $mygroup = $client->coreGroupsRetrieve($group_id);
 
@@ -107,21 +110,21 @@ function action_edit_team()
 
     $org_users = $mygroup->getUsersObj();
 
-// Liste der Nutzer, die entfernt werden sollen (basierend auf Benutzer-IDs)
+// List of users to be removed (based on user IDs)
     $removeUsers = array_filter($org_users, function ($user) use ($matchingUsers) {
         return !in_array($user->getPk(), array_map(function ($user) {
             return $user->getPk();
         }, $matchingUsers));
     });
 
-// Liste der Nutzer, die hinzugefügt werden sollen (basierend auf Benutzer-IDs)
+// List of users to be added (based on user IDs)
     $newUsers = array_filter($matchingUsers, function ($user) use ($org_users) {
         return !in_array($user->getPk(), array_map(function ($user) {
             return $user->getPk();
         }, $org_users));
     });
 
-
+// API-CALL: remove
     foreach ( $removeUsers as $ru) {
         $client->coreGroupsRemoveUserCreate($pk,
             new \OpenAPI\Client\Model\UserAccountRequest(
@@ -134,7 +137,7 @@ function action_edit_team()
     }
     /* add User */
 
-
+// API-CALL: add
     foreach ( $newUsers as $nu)
     {
     $client->coreGroupsAddUserCreate($pk,
@@ -147,7 +150,7 @@ function action_edit_team()
     );
     }
 
-    // Redirect to overview after sucessfully changed team
+    // Redirect to overview
     $referer = wp_get_referer();
     $url_without_view = remove_query_arg('view', wp_get_referer());
     header('Location:' . $url_without_view);
