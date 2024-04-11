@@ -25,7 +25,7 @@
         {% for team in all_teams%}
             <div role="row" onclick="showLoading();document.getElementById('form-{{ get_team_id(team)}}').submit();">
                 <span role="cell">{{ get_team_name(team) }}</span>
-                <span role="cell">{{ get_team_leader(team) }}</span>
+                <span role="cell">{{ get_team_leader(team,users) }}</span>
             </div>
         {% endfor %}
         </div>
@@ -53,7 +53,7 @@
         {% for team in my_teams %}
             <div role="row" onclick="showLoading();document.getElementById('form-{{ get_team_id(team)}}').submit();">
                 <span role="cell">{{ get_team_name(team) }}</span>
-                <span role="cell">{{ get_team_leader(team) }}</span>
+                <span role="cell">{{ get_team_leader(team,users) }}</span>
             </div>
         {% endfor %}
     </div>

@@ -5,47 +5,14 @@ use Twig\Environment;
 
 include_once  dirname( __DIR__ ) .'/helper.php';
 
-
-function get_team_leader($group) {
-    // Konzept: Username der TeamLeader werden in Gruppenattributen als Leader gespeichert.
-    $leader = null;
-    if (isset($group->getAttributes()['Leader'])) {
-        $leader = $group->getAttributes()['Leader'];
-    } else {
-        $leader = $group->getUsersObj()[0]->getUsername();
-    }
-    return get_auth_user_by_username($leader)->getName();
-}
-
-
-
-
 /**
  * Zeigt in einer Tabelle alle Teammitglieder und die Teamadmins an.
  * @return string
  * @throws \OpenAPI\Client\ApiException *
  */
-function get_all_teams_view()
+function get_all_teams_view($users, $groups)
 {
     // Backend initialisieren
-
-    $client = get_API_instance_func();
-    $groups = $client->coreGroupsList()->getResults();
-    $groups = array_filter($groups, function ($item){return !empty($item->getUsersObj());});
-
-
-    if (get_option("group_prefix")) {
-        $groups = array_filter($groups, function ($item) {
-            return strpos($item->getName(), get_option("group_prefix")) === 0;
-        });
-        $prefixLength = strlen(get_option("group_prefix"));
-        foreach ($groups as $item) {
-            $name = $item->getName();
-            if (strpos($name, get_option("group_prefix")) === 0) {
-                $item->setName(substr($name, $prefixLength));
-            }
-        }
-   }
     $target_user = wp_get_current_user()->display_name;
 
     $mygroups =array_filter($groups, function ($group) use ($target_user) {
@@ -61,8 +28,6 @@ function get_all_teams_view()
         return !in_array($group, $mygroups);
     });
 
-
-
     // Twig-Loader und -Environment initialisieren
     $loader = new FilesystemLoader('wp-content/plugins/authentik_teams/views/templates');
     $twig = new Environment($loader);
@@ -77,8 +42,9 @@ function get_all_teams_view()
     $template = $twig->load('view_all.twig');
 
     $html = $template->render(array(
+    'users' => $users,
     'all_teams' => $groups,
-        'my_teams' => $mygroups,
+    'my_teams' => $mygroups,
     'admin_post_url' => admin_url('admin-post.php')
 
     ));

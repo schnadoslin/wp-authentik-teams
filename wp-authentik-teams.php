@@ -27,20 +27,26 @@ include dirname( __FILE__ ) .'/views/edit_team.php';
 
 function open_wp_auth_teams( $atts )
 {
+    // Load all data once
+    $client = get_API_instance_func();
+    $users = get_filtered_Users($client);
+    $groups = get_filtered_groups($client);
+
+
     $view = $_GET['view'] ?? 'default';
     switch ($view) {
         case 'create':
-            return get_create_teams_view();
+            return get_create_teams_view($users, $groups);
             break;
         case 'edit':
-            return get_edit_teams_view();
+            return get_edit_teams_view($users, $groups);
             break;
         case 'view':
-            return get_all_teams_view();
+            return get_all_teams_view($users, $groups);
             break;
         default:
             // Laden Sie ein Standard-Twig
-            return get_all_teams_view();
+            return get_all_teams_view($users, $groups);
             break;
     }
   wp_die("Unknown View requested:". $view ." - The wp_auth_teams plugin is confused.");

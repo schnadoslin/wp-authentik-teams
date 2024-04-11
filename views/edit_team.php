@@ -5,9 +5,16 @@ use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 include_once  dirname( __DIR__ ) .'/helper.php';
 
-function get_edit_teams_view()
+/**
+ * @param \OpenAPI\Client\Model\User[] $users
+ * @param \OpenAPI\Client\Model\Group[] $groups
+ * @return string
+ * @throws \Twig\Error\LoaderError
+ * @throws \Twig\Error\RuntimeError
+ * @throws \Twig\Error\SyntaxError
+ */
+function get_edit_teams_view($users, $groups)
 {
-
     // Fügen Sie die Option hinzu, wenn sie noch nicht existiert
     if (!get_option('success')) {
         add_option('success', '');
@@ -16,12 +23,13 @@ function get_edit_teams_view()
     session_start();
     $team_id = $_SESSION['team_id'];
 
-    $client = get_API_instance_func();
-    $users = get_filtered_Users($client);
-
-    $group = $client->coreGroupsRetrieve(
-        str_replace("-", "", $team_id),
-    );
+    /** @var \OpenAPI\Client\Model\Group $group */
+    $group = array_reduce($groups, function ($carry, $group) use ($team_id) {
+        if ($group['pk'] === $team_id) {
+            return $group;
+        }
+        return $carry;
+    }, null);
 
     $name = $group->getName();
     $prefixLength = strlen(get_option("group_prefix"));
@@ -29,9 +37,11 @@ function get_edit_teams_view()
         $group->setName(substr($name, $prefixLength));
     }
 
+
     // Twig-Loader und -Environment initialisieren
     $loader = new FilesystemLoader('wp-content/plugins/authentik_teams/views/templates');
     $twig = new Environment($loader);
+
     // Funktionen laden
     $twig->addFunction(new \Twig\TwigFunction('get_team_name','get_team_name'));
     $twig->addFunction(new \Twig\TwigFunction('asset','asset'));
@@ -40,18 +50,18 @@ function get_edit_teams_view()
     $twig->addFunction(new \Twig\TwigFunction('get_user_id','get_user_id'));
     $twig->addFunction(new \Twig\TwigFunction('get_user_name','get_user_name'));
 
-
     // Vorlage laden und rendern
     $template = $twig->load('edit_team.twig');
 
     $html = $template->render(array(
-        'team_leader' => get_team_leader($group),
+        'team_leader' => get_team_leader($group, $users),
         'team_id' => $group->getPk(), // hier muss man den prefix noch entfernen,
         'team' => $group,
         'admin_post_url' => admin_url('admin-post.php'),
         'all_users' => $users
 
     ));
+
     return $html;
 }
 
@@ -65,7 +75,6 @@ add_action('admin_post_edit_team', 'action_edit_team');
 function action_edit_team()
 {
     $client = get_API_instance_func();
-
     $users = $client->coreUsersList()->getResults();
 
     $selectedOptions = $_POST['selectedOptions'];

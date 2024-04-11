@@ -17,8 +17,9 @@ include_once  dirname( __DIR__ ) .'/helper.php';
  * @return string
  * @throws \OpenAPI\Client\ApiException *
  */
-function get_create_teams_view()
+function get_create_teams_view($users, $groups)
 {
+    $debug_create_start_time = microtime(true);
     // Fügen Sie die Option hinzu, wenn sie noch nicht existiert
     if (!get_option('teamname_taken')) {
         add_option('teamname_taken', '');
@@ -27,11 +28,6 @@ function get_create_teams_view()
     if (!get_option('user_not_in_team')) {
         add_option('user_not_in_team', '');
     }
-
-    // Backend initialisieren
-
-    $client = get_API_instance_func();
-    $users = get_filtered_Users($client);
 
     // Twig-Loader und -Environment initialisieren
     $loader = new FilesystemLoader('wp-content/plugins/authentik_teams/views/templates');

@@ -38,7 +38,7 @@
                     {% endif %}
                 {% endfor %}
             </ul>
-            {% if is_leader(team, team_leader) %}
+            {% if is_leader(team, all_users) %}
             <button type="button"
                     id="ex2-add"
                     class="move-right-btn"
@@ -70,7 +70,7 @@
                     {% endif %}
                 {% endfor %}
             </ul>
-            {% if is_leader(team) %}
+            {% if is_leader(team, all_users) %}
             <button type="button"
                     id="ex2-delete"
                     class="move-left-btn"
@@ -91,7 +91,7 @@
     </p>
     <input type="hidden" id="selectedOptions" name="selectedOptions">
     <div id="container" style="display: flex; justify-content: center; align-items: center;">
-    {% if is_leader(team) %}
+    {% if is_leader(team, all_users) %}
     <button class="button button-primary" type="submit" id="editTeamButton" onclick="showLoading()">Save Changes on Team</button>
     {% endif %}
     <div id="loading" style="display: none;">

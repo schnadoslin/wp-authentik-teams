@@ -10,7 +10,11 @@ use OpenAPI\Client\Api\CoreApi;
  */
 function get_filtered_Users($client)
 {
-    $users = $client->coreUsersList()->getResults();
+    $users = $client->coreUsersList();
+
+    $users = $users->getResults();
+
+
     if (get_option('admin_prefix'))
     {       // remove admin_prefix
         $users = array_filter($users, function ($item) {
@@ -28,30 +32,35 @@ function get_filtered_Users($client)
             return $item->getIsActive();
         });
     }
+
     return $users;
 }
 
+
 /**
- * @param $username
- * @return User
+ * @param $client
+ * @return Group[]
  */
-function get_auth_user_by_username ($username)
+function get_filtered_groups($client)
 {
-    $client = get_API_instance_func();
-    foreach (array_filter($client->coreUsersList()->getResults()) as $item)
-    {
-        if ($item->getUsername()==$username)
-            return $item;
+    $groups = $client->coreGroupsList()->getResults();
+    $groups = array_filter($groups, function ($item){return !empty($item->getUsersObj());});
+
+    if (get_option("group_prefix")) {
+        $groups = array_filter($groups, function ($item) {
+            return strpos($item->getName(), get_option("group_prefix")) === 0;
+        });
+        $prefixLength = strlen(get_option("group_prefix"));
+        foreach ($groups as $item) {
+            $name = $item->getName();
+            if (strpos($name, get_option("group_prefix")) === 0) {
+                $item->setName(substr($name, $prefixLength));
+            }
+        }
     }
-
-
-    /*$filtered = array_filter($client->coreUsersList()->getResults(),function ($item) use ($username){return $item->getUsername()==$username;});
-    throw new Exception($filtered ."User not found by username " . $username);
-    if(empty($filtered))*/
-    throw new Exception("User not found by username " . $username);
-    /*else
-        return $filtered[0];*/
+    return $groups;
 }
+
 
 
 // TWIG - Funktions.
@@ -69,16 +78,42 @@ function is_in_group($target_user,$group)
 
     return !empty($filtered_objects);}
 
+
+/**
+ * @param \OpenAPI\Client\Model\Group $group
+ * @param \OpenAPI\Client\Model\User[] $users
+ * @return string
+ * @throws Exception
+ */
+function get_team_leader($group, $users) {
+    // Konzept: Username der TeamLeader werden in Gruppenattributen als Leader gespeichert.
+    $leader = null;
+    if (isset($group->getAttributes()['Leader'])) {
+        $leader = $group->getAttributes()['Leader'];
+    } else {
+        throw new Exception("no team leader found");
+        //$leader = $group->getUsersObj()[0]->getUsername();
+    }
+
+    foreach ($users as $u)
+    {
+        if($u->getUsername()==$leader)
+            return  $u->getName();
+    }
+    throw new Exception("no user found with " . $leader . " as username");
+}
+
+
 /**
  * @param User $target_user
  * @param Group $group
  * @return string
  */
-function is_leader($group)
+function is_leader($group, $users)
 {
     $leader = $group->getAttributes()["Leader"];
 
-    $cur = get_current_Authentik_User();
+    $cur = get_current_Authentik_User($users);
     if ( $cur->getUsername() == $leader )
         return true;
 
@@ -130,12 +165,11 @@ function is_current_user($user)
 }
 
 /**
- * @return User
+ * @param User[] $users
+ * @return mixed
  */
-function get_current_Authentik_User()
+function get_current_Authentik_User($users)
 {
-    $client = get_API_instance_func();
-    $users = get_filtered_Users($client);
     $matchingCurrentUser = array_reduce($users, function ($carry, $user) {
         if ($user['name'] === wp_get_current_user()->display_name) {
             return $user;
