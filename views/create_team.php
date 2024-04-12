@@ -67,7 +67,6 @@ function action_create_team() {
 
     // security checks: Team-membership
     $users = $client->coreUsersList()->getResults();
-
     $selectedOptions = $_POST['selectedOptions'];
     $selectedOptions = json_decode(stripslashes($selectedOptions));
     if(empty($selectedOptions))
@@ -80,8 +79,10 @@ function action_create_team() {
     $matchingUsers = array_filter($users, function ($user) use ($selectedOptions) {
         return in_array($user->getUuid(), $selectedOptions);
     });
+
+    /** @var User $user */
     $matchingCurrentUser = array_reduce($matchingUsers, function ($carry, $user) {
-        if ($user['name'] === wp_get_current_user()->display_name) {
+        if ($user->getUsername() === wp_get_current_user()->user_login) {
             return $user;
         }
         return $carry;

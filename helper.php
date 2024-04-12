@@ -86,7 +86,7 @@ function is_in_group($target_user,$group)
 
 
 /**
- * Returns the Displayname of the Teamlead of the passed group
+ * Returns the Users Displayname of the Teamlead of the passed group
  * @param \OpenAPI\Client\Model\Group $group
  * @param \OpenAPI\Client\Model\User[] $users
  * @return string
@@ -161,14 +161,14 @@ function get_user_id($user)
     return $user->getUuid();
 }
 /**
- * returns if the passed Authentik-User is the Wordpress User by comparing the Wordpress Display Name
+ * returns if the passed Authentik-User is the Wordpress User by comparing the Wordpress Username
  * @param User $user
  * @return mixed
  */
 function is_current_user($user)
 {
-    $current_user = wp_get_current_user()->display_name;
-    if ($user->getName() == $current_user)
+    $current_user = wp_get_current_user()->user_login;
+    if ($user->getUsername() == $current_user)
         return true;
     return false;
 }

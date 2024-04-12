@@ -19,10 +19,9 @@ function get_edit_teams_view($users, $groups)
     // Determine the current group
     session_start();
     $team_id = $_SESSION['team_id'];
-
     /** @var \OpenAPI\Client\Model\Group $group */
     $group = array_reduce($groups, function ($carry, $group) use ($team_id) {
-        if ($group['pk'] === $team_id) {
+        if ($group->getPk() === $team_id) {
             return $group;
         }
         return $carry;
@@ -92,9 +91,11 @@ function action_edit_team()
         return in_array($user->getUuid(), $selectedOptions);
     });
 
+    /** @var \OpenAPI\Client\Model\User $user */
     $matchingCurrentUser = array_filter($matchingUsers, function ($user) {
-        return $user['name'] == wp_get_current_user()->display_name;
+        return $user->getUsername() == wp_get_current_user()->user_login;
     });
+
     if(empty($matchingCurrentUser))
     {
         update_option('user_not_in_team', 'You have to be in your own team ...');

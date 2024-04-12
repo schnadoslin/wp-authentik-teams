@@ -3,7 +3,7 @@
 Plugin Name: Authentik WP Teams
 Plugin URI: https://github.com/schnadoslin/wp-authentik-teams
 Description: Provide Wordpress Team-Management with Authentik IAM.
-Version: 0.2
+Version: 1.0
 Author: schnadoslin
 Author URI: https://github.com/schnadoslin
 License: A "Slug" license name e.g. GPL2
