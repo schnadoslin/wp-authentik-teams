@@ -1,5 +1,6 @@
 # wp-authentik-teams
-Wordpress Plugin for Team-Management with Authentik IAM.
+Wordpress Plugin for Team-Management with Authentik Identity and Access 
+Management (IAM).
 ### Scenario
 Authentik is used as IAM.
 You run a WordPress website whose user management is handled by Authentik.
@@ -29,21 +30,23 @@ The plugin works as it is, but the appropriate vendors must be installed and the
 ### Prepare the plugin
 - Clone the repository
 - Install the  the [OpenAPI Generator](https://openapi-generator.tech/) 
-<code> npm install @openapitools/openapi-generator-cli -g </code>
+` npm install @openapitools/openapi-generator-cli -g `
 - Generate your php code
-  <code> openapi-generator-cli generate -g php -o out -i https://..authentik-url..>/api/v3/schema/ </code>
-- If you have not already done so, install the php packages (e.g. <code> apt install php-curl php-xml </code> )
+  ` openapi-generator-cli generate -g php -o out -i https://..authentik-url..>/api/v3/schema/ `
+- If you have not already done so, install the php packages (e.g. ` apt install php-curl php-xml ` )
 - Install the PHP dependency manager [Composer](https://getcomposer.org/)  : \
-<code>php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+```
+ php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" 
  php -r "if (hash_file('sha384', 'composer-setup.php') === '8a6138e2a05a8c28539c9f0fb361159823655d7ad2deecb371b04a83966c61223adc522b0189079e3e9e277cd72b8897') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"\
  php composer-setup.php \
- php -r "unlink('composer-setup.php');" \
-</code>
-- Now compose :) <code>  sudo composer update </code>
+ php -r "unlink('composer-setup.php');" 
+ ```
+- Now compose :) ` composer update `
 
-You should now have compiled everything and your plugin is ready to be uploaded to Wordpress: <code>/wp-content/plugins/authentik-teams</code>.
 
-### setup the plugin
+You should now have compiled everything and your plugin is ready to be uploaded to Wordpress: `/wp-content/plugins/authentik-teams`
+
+### Setup the plugin
 The plugin has a settings page that can be found in the "Settings/Authentic Teams" dashboard-menu in Wordpress.
 - Authentik API Token: Insert your api token here. You can create one in Authentik under Directory/Tokens and App passwords
 - Authentik Base URL: .. by now this has now impact .. maybe we can replace the url instead of the openapigenerator, but the plugin will die on api changes..
