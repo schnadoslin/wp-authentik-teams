@@ -66,19 +66,7 @@ function action_create_team() {
         }
 
     // security checks: Team-membership
-    $users = $client->coreUsersList()->getResults();
-    $selectedOptions = $_POST['selectedOptions'];
-    $selectedOptions = json_decode(stripslashes($selectedOptions));
-    if(empty($selectedOptions))
-    {
-        update_option('user_not_in_team', 'You have to be in your own team ...');
-        wp_redirect(wp_get_referer());
-        exit();
-    }
-
-    $matchingUsers = array_filter($users, function ($user) use ($selectedOptions) {
-        return in_array($user->getUuid(), $selectedOptions);
-    });
+    list($users, $matchingUsers) = init_team_changes($client);
 
     /** @var User $user */
     $matchingCurrentUser = array_reduce($matchingUsers, function ($carry, $user) {
@@ -147,4 +135,28 @@ function change_to_view_team()
     $url_without_view = remove_query_arg('view', wp_get_referer());
     header('Location:' . $url_without_view);
     exit;
+}
+
+/**
+ * Get team from database and check current User. Used in Create & Edit
+ * @param \OpenAPI\Client\Api\CoreApi $client
+ * @return array|void
+ * @throws \OpenAPI\Client\ApiException
+ */
+function init_team_changes(\OpenAPI\Client\Api\CoreApi $client)
+{
+    $users = $client->coreUsersList()->getResults();
+    $selectedOptions = $_POST['selectedOptions'];
+    $selectedOptions = json_decode(stripslashes($selectedOptions));
+
+    // Sanity checks
+    if (empty($selectedOptions)) {
+        update_option('user_not_in_team', 'You have to be in your own team ...');
+        wp_redirect(wp_get_referer());
+        exit();
+    }
+    $matchingUsers = array_filter($users, function ($user) use ($selectedOptions) {
+        return in_array($user->getUuid(), $selectedOptions);
+    });
+    return array($users, $matchingUsers);
 }

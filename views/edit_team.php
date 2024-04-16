@@ -75,21 +75,7 @@ add_action('admin_post_edit_team', 'action_edit_team');
 function action_edit_team()
 {
     $client = get_API_instance_func();
-    $users = $client->coreUsersList()->getResults();
-
-    $selectedOptions = $_POST['selectedOptions'];
-    $selectedOptions = json_decode(stripslashes($selectedOptions));
-
-    // Security checks
-    if(empty($selectedOptions))
-    {
-        update_option('user_not_in_team', 'You have to be in your own team ...');
-        wp_redirect(wp_get_referer());
-        exit();
-    }
-    $matchingUsers = array_filter($users, function ($user) use ($selectedOptions) {
-        return in_array($user->getUuid(), $selectedOptions);
-    });
+    list($users, $matchingUsers) = init_team_changes($client);
 
     /** @var \OpenAPI\Client\Model\User $user */
     $matchingCurrentUser = array_filter($matchingUsers, function ($user) {
@@ -103,9 +89,15 @@ function action_edit_team()
         exit();
     }
 
-// Updating Group
+    // Updating Group
      $group_id = $_POST['team_id'];
      $mygroup = $client->coreGroupsRetrieve($group_id);
+
+     //Security Check
+    if(!is_leader($mygroup, $users))
+    {
+        throw new Exception("No permission to make changes.");
+    }
 
     $pk = str_replace("-", "", $group_id);
 
@@ -159,3 +151,38 @@ function action_edit_team()
 }
 
 
+
+/**
+ * Hook for deleting team. This hook is used to delete a Team page.
+ */
+add_action('admin_post_delete_team', 'delete_team');
+
+/**
+ * Delete the team and redirect to overview
+ * @return void
+ */
+function delete_team()
+{
+    $client = get_API_instance_func();
+    // Getting values from database
+    $group_id = $_POST['team_id'];
+    echo "id: " .$group_id;
+    $mygroup = $client->coreGroupsRetrieve($group_id);
+    $users = $client->coreUsersList()->getResults();
+    echo "here?";
+    //Security Check
+    if(!is_leader($mygroup, $users))
+    {
+        throw new HttpException("Only teamleader have permission",403);
+    }
+    echo "is admin";
+    // API-CALL: remove
+    $pk = str_replace("-", "", $group_id);
+    $client->coreGroupsDestroy($pk);
+
+    echo "destoyed";
+    $referer = wp_get_referer();
+    $url_without_view = remove_query_arg('view', wp_get_referer());
+    header('Location:' . $url_without_view);
+    exit;
+}

@@ -9,7 +9,7 @@
 
 <form  onsubmit="gatherSelectedOptions()" id="edit_team_form" action="{{ admin_post_url }}" method="post" >
     <input type="hidden" name="action" value="edit_team">
-    <input type="hidden" name="team_id" value={{team_id}}>
+    <input type="hidden" name="team_id" value="{{team_id}}">
 
     <h1>{{ get_team_name(team) }}</h1>
     <div>
@@ -112,6 +112,11 @@
             selectedOptionsInput.value = JSON.stringify(selectedOptions);
         }
     </script>
+</form>
+<form  id="delete_team_form" action="{{ admin_post_url }}" method="post" >
+    <input type="hidden" name="action" value="delete_team">
+    <input type="hidden" name="team_id" value="{{team_id}}">
+    <button class="button button-primary" type="submit" id="returnButton" onclick="showLoading();">Delete Team</button>
 </form>
 <form  id="change_to_view_team_form" action="{{ admin_post_url }}" method="post" >
     <input type="hidden" name="action" value="change_to_view_team">

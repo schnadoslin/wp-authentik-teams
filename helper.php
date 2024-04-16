@@ -113,7 +113,7 @@ function get_team_leader($group, $users) {
 
 /**
  * Returns if the current logged in Wordpress-User is the Leader of the passed Authentik Group
- * @param Users $users
+ * @param User[] $users
  * @param Group $group
  * @return string
  */
