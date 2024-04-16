@@ -113,11 +113,14 @@
         }
     </script>
 </form>
+{% if is_leader(team, all_users) %}
 <form  id="delete_team_form" action="{{ admin_post_url }}" method="post" >
     <input type="hidden" name="action" value="delete_team">
     <input type="hidden" name="team_id" value="{{team_id}}">
     <button class="button button-primary" type="submit" id="returnButton" onclick="showLoading();">Delete Team</button>
 </form>
+{% endif %}
+
 <form  id="change_to_view_team_form" action="{{ admin_post_url }}" method="post" >
     <input type="hidden" name="action" value="change_to_view_team">
     <button class="button button-primary" type="submit" id="returnButton" onclick="showLoading();">Return to team overview</button>

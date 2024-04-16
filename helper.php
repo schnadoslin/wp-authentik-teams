@@ -122,6 +122,10 @@ function is_leader($group, $users)
     $leader = $group->getAttributes()["Leader"];
 
     $cur = get_current_Authentik_User($users);
+
+    if($cur == null)
+        return false;
+
     if ( $cur->getUsername() == $leader )
         return true;
 
@@ -180,6 +184,9 @@ function is_current_user($user)
  */
 function get_current_Authentik_User($users)
 {
+    // Users does not contain user with Admin-Prefix. So admin will be null...
+    // might be a bug.
+    
     $matchingCurrentUser = array_reduce($users, function ($carry, $user) {
         if (is_current_user($user)) {
             return $user;
