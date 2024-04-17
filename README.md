@@ -59,4 +59,9 @@ The plugin has a settings page that can be found in the "Settings/Authentic Team
 - Use it in wordpress with the shortcode: [all_teams]
 - You see two tables. left table are all groups without you. right table are all groups you are member of.
 - You can click on a table-row to navigate to the edit page of the group. If you are the team-leader, you can add and remove members and save the changes. If you are not the leader, you can just view.
-- You can create a team. The member who creates the team, has to be in the team itself. He will be the team-leader (saved as attribute in the Authentik-group).  
+- You can create a team. The member who creates the team, has to be in the team itself. He will be the team-leader (saved as attribute in the Authentik-group).
+
+## Demo
+![over_view](demo/view_all.jpg)
+![create view](demo/create_view.JPG)
+![edit view](demo/edit_view.jpg)
