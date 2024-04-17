@@ -30,7 +30,7 @@ function get_all_teams_view($users, $groups)
     });
 
     // Initialize Twig-Loader und -Environment
-    $loader = new FilesystemLoader('wp-content/plugins/authentik_teams/views/templates');
+    $loader = new FilesystemLoader(WP_PLUGIN_DIR . '/authentik_teams/views/templates');
     $twig = new Environment($loader);
     // Load Functionen
     $twig->addFunction(new \Twig\TwigFunction('get_team_leader','get_team_leader'));

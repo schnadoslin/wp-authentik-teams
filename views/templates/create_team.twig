@@ -9,10 +9,10 @@
 <form  onsubmit="gatherSelectedOptions()" id="create_team_form" action="{{ admin_post_url }}" method="post" >
 <input type="hidden" name="action" value="create_team">
 
-    <h1>Create PhaKIR Team</h1>
+    <h2>Create PhaKIR Team</h2>
     <div>
         <label for="teamname">Team name:</label>
-        <input aria-required="true" autocomplete="teamname" name="teamname" aria-label="teamname" type="text">
+        <input class="teamname-input" aria-required="true" autocomplete="teamname" name="teamname" aria-label="teamname" type="text">
     </div>
 
 <div class="listbox-area">
@@ -81,11 +81,15 @@
         <span aria-live="polite" id="ms_live_region"></span>
     </div>
 </div>
-<p>
- noch weiterer Text, der evtl. hilfreich ist
-</p>
+<ul style="margin-left: 20px;">
+  <li>To create a team, the leader must be included in the list on the right.</li>
+  <li>Choose team members by clicking on them and then add them to the list using the 'Add' button.</li>
+  <li>Remove members using the 'Remove' button.</li>
+  <li>Click on 'Create Team' to finalize the team creation.</li>
+  <li>Delete the team by clicking on 'Delete'.</li>
+</ul>
     <input type="hidden" id="selectedOptions" name="selectedOptions">
-    <div id="container" style="display: flex; justify-content: center; align-items: center;">
+    <div id="container">
     <button  class="button button-primary" type="submit" id="createTeamButton" onclick="showLoading()">Create Team</button>
     <div id="loading" style="display: none;">
         <div class="spinner"></div>

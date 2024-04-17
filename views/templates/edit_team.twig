@@ -11,9 +11,9 @@
     <input type="hidden" name="action" value="edit_team">
     <input type="hidden" name="team_id" value="{{team_id}}">
 
-    <h1>{{ get_team_name(team) }}</h1>
-    <div>
-        Team Leader: {{ team_leader }}
+    <h2>{{ get_team_name(team) }}</h2>
+    <div style="margin-bottom: 30px;">
+        <strong>Team Leader: {{ team_leader }} </strong>
     </div>
         <div class="listbox-area">
         <div class="left-area">
@@ -86,11 +86,8 @@
             <span aria-live="polite" id="ms_live_region"></span>
         </div>
     </div>
-    <p>
-        noch weiterer Text, der evtl. hilfreich ist
-    </p>
     <input type="hidden" id="selectedOptions" name="selectedOptions">
-    <div id="container" style="display: flex; justify-content: center; align-items: center;">
+    <div id="container">
     {% if is_leader(team, all_users) %}
     <button class="button button-primary" type="submit" id="editTeamButton" onclick="showLoading()">Save Changes on Team</button>
     {% endif %}

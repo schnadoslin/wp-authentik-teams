@@ -3,22 +3,26 @@
     grid-gap: 2em;
     grid-template-columns: repeat(2, 1fr);
     padding: 20px;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-    background: #eee;
+    border-radius: 25px;
+    background: #1B2C3E;
+}
+
+#ms_av_l.listbox-label, #ms_ch_l.listbox-label {
+    display: block;
+    text-align: center;
+    color:white;
 }
 
 [role="listbox"] {
-    margin: 1em 0 0;
-    padding: 0;
-    min-height: 18em;
-    border: 1px solid #aaa;
+    min-height: 25em;
+    border-radius: 25px;
     background: white;
+    width: 70%;
 }
 
 [role="listbox"]#ss_elem_list {
     position: relative;
-    max-height: 18em;
+    max-height: 25em;
     overflow-y: auto;
 }
 
@@ -38,7 +42,8 @@
     padding: 0 0.5em;
     font-weight: bold;
     line-height: 2;
-    background-color: #ccc;
+    background: #1B2C3E;
+    color:white;
 }
 
 [role="option"] {
@@ -51,20 +56,21 @@
 }
 
 [role="listbox"]:focus [role="option"].focused {
-    background: #bde4ff;
+    background: #CBDDF4;
 }
 
 [role="listbox"]:focus [role="option"].focused,
 [role="option"]:hover {
     outline: 2px solid currentcolor;
+    width: 80%;
 }
 
 .move-right-btn span.checkmark::after {
-    content: " →";
+    content: " ►";
 }
 
 .move-left-btn span.checkmark::before {
-    content: "← ";
+    content: "◄ ";
 }
 
 [role="option"][aria-selected="true"] span.checkmark::before {
@@ -119,8 +125,9 @@ button[aria-haspopup="listbox"] + [role="listbox"] {
 }
 
 [role="toolbar"] > * {
-    border: 1px solid #aaa;
-    background: #ccc;
+    border-radius: 25px;
+    margin: 50px;
+    background: #eee;
 }
 
 [role="toolbar"] > [aria-disabled="false"]:focus {
@@ -136,7 +143,7 @@ button[aria-disabled="true"] {
 }
 
 .annotate {
-    color: #366ed4;
+    color: #98b3e5;
     font-style: italic;
 }
 

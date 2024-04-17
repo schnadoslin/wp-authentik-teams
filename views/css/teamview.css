@@ -1,4 +1,4 @@
 
-.floatLeft { width: 49%; float: left; margin-right: 1%;}
-.floatRight {width: 49%; float: right; margin-left: 1%; }
-.container { overflow: hidden; }
+.floatLeft {width: 49%; float: left; margin-right: 1%; padding-left: 50px;}
+.floatRight {width: 49%; float: right; margin-left: 1%; padding-left: 60px;}
+.container {  }
